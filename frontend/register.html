@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - TO DO APP</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="navigation">
+      <div>
+        <a href="/frontend/index.html">Home</a>
+        <a href="./register.html">Register</a>
+        <a href="./login.html">Login</a>
+      </div>
+    </div>
+    <div class="form-container">
+      <h2>Register</h2>
+      <form id="register-form">
+        <div class="row">
+          <input id="email" type="email" name="email" placeholder="Email" required>
+        </div>
+        <div class="row">
+          <input id="password" type="password" name="password" placeholder="Password" required>
+        </div>
+        <div class="row">
+          <button type="submit">Register</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    const form = document.getElementById('register-form');
+    form.addEventListener("submit", handleFormSubmit);
+
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const response = await fetch('http://localhost:3000/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        alert(data.error);
+      } else {
+        alert('User registered successfully');
+        window.location.href = '/frontend/login.html';
+      }
+    }
+  </script>
+</body>
+</html>
