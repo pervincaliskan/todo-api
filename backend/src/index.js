@@ -25,44 +25,6 @@ app.use(
 );
 app.use(cookieParser());
 
-const todos = [
-  {
-    id: 1,
-    title: "Todo 1",
-    description: "Description 1",
-    done: false,
-    userId: 1,
-  },
-  {
-    id: 2,
-    title: "Todo 2",
-    description: "Description 2",
-    done: false,
-    userId: 2,
-  },
-  {
-    id: 3,
-    title: "Todo 3",
-    description: "Description 3",
-    done: false,
-    userId: 2,
-  },
-];
-
-const users = [
-  {
-    id: 1,
-    email: "admin@admin.com",
-    password: "$2a$10$pHfa.YBKRzJeHl6Y0PguuOi.gjqVHwaW.AKUxq.uoDbpLmrOd.MJy",
-    role: "admin",
-  },
-  {
-    id: 2,
-    email: "user@user.com",
-    password: "$2a$10$MLnpzLWrDF7un5VcugJ/0upxp4GJDHpRHhjsrAzaXYoueZPQHfMKq",
-    role: "user",
-  },
-];
 
 const TodoSchema = new mongoose.Schema({
   title: { type: String, required: [true, "Title is required"] },
@@ -167,20 +129,6 @@ async function userPermissionMiddleware(req, res, next) {
   }
 }
 
-function checkIdParamsValidMiddleware(req, res, next) {
-  if (typeof req.params.id === "string") {
-    const isValidNumber = isNaN(parseInt(req.params.id)) === false;
-
-    if (isValidNumber) {
-      req.params.id = parseInt(req.params.id);
-      next();
-    } else {
-      res.status(400).json({ message: "ID must be a number" });
-    }
-  } else {
-    res.status(400).json({ message: "ID is required" });
-  }
-}
 
 app.get("/users", async (req, res) => {
   try {
@@ -210,8 +158,16 @@ app.get("/users/:id", async (req, res) => {
     res.status(500).json({ message: err.message || "Internal Server Error" });
   }
 });
+app.get("/me", authenticatedMiddleware, async (req, res) => {
+  try {
+    const user = await UserModel.findById(res.locals.userId);
+    res.json({ result: user });
+  } catch (error) {
+    res.status(500).json({ message: err.message || "Internal Server Error" });
+  }
+});
 
-app.post("/users", async (req, res) => {
+app.post("/auth/register", async (req, res) => {
   try {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(req.body.password, salt);
@@ -369,7 +325,7 @@ app.put(
   }
 );
 
-app.delete("/todos/:id", authenticatedMiddleware, async (req, res) => {
+app.delete("/todos/:id", authenticatedMiddleware, todoPermissionMiddleware,  async (req, res) => {
   try {
     const todo = await TodoModel.findById(req.params.id);
     if (todo === null) {
