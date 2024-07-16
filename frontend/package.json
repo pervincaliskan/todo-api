@@ -1,0 +1,21 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "axios": "^0.21.4",
+    "vue": "^3.4.31",
+    "vue-router": "^4.4.0",
+    "vue3-toastify": "^0.2.2",
+    "vuex": "^4.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.3.3"
+  }
+}
